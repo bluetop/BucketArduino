@@ -5,20 +5,23 @@
 
 // author T Fawcet
 #pragma once
+#include "Arduino.h"
 
 
 //Tracks the number of seconds between state changes
 class TimeTracker
 {
-private: 
+private:  
 	unsigned long startTimeMillis;
+	long timeoutMillis;
 
 public:
-	TimeTracker();
+	TimeTracker(long timeoutMillis);
 	~TimeTracker();
 	
 	int getSeconds();
-
 	void reset();
+	boolean timeoutReached();
+	long getTimeout();
 };
 

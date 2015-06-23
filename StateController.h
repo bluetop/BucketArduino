@@ -10,17 +10,17 @@
 #include "Arduino.h"
 
 class StateController
-{
+{ 
 private:
 	//Time limits in seconds
-	int static const MAX_COOLING_TIME = 15;
-	int static const MIN_OFF_TIME = 5;
+	int static const MAX_COOLING_TIME = 1800;
+	int static const MIN_OFF_TIME = 30;
 
 	int currentState;
 	int secondsPassed;
-	float bucketTemperature;
+	float beerTemperature;
 	float targetTemperature;
-	float chillerBoxTemperature;
+	float ambientTemperature;
 
 	TimeTracker* timeTracker;
 
@@ -35,13 +35,17 @@ public:
 	int static const STATE_COOLING = 10; //The bucket is currently cooling
 	int static const STATE_HEATING = 12; //The bucket is currently heating
 	int static const STATE_OFF = 15; //The bucket is neither heating or cooling
-
+	
 
 	int checkState();
-	void setBucketTemperature(float temperature);
+	void setBeerTemperature(float temperature);
 	void setSecoundsPassed(int seconds);
 	void setTargetTemperature(float maxTemp);
-	void setChillerBoxTemperature(float temperature);
+	float getTargetTemperature();
+	float getBeerTemperature();
+	float getAmbientTemperature();
+	void setAmbientTemperature(float temperature);
 	String getDescription();
+	String getState();
 };
 

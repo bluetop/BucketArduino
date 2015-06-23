@@ -8,8 +8,8 @@
 
 StateController::StateController(TimeTracker* timeTracker)
 {
-	this->bucketTemperature = -100;
-	this->secondsPassed = -100;
+	this->beerTemperature = -100;
+	this->secondsPassed = -100; 
 	this->currentState = STATE_OFF;
 	this->targetTemperature = -100;
 	this->timeTracker = timeTracker;
@@ -22,13 +22,13 @@ StateController::~StateController()
 
 }
 
-void StateController::setBucketTemperature(float temperature) {
-	this->bucketTemperature = temperature;
+void StateController::setBeerTemperature(float temperature) {
+	this->beerTemperature = temperature;
 }
 
 
-void StateController::setChillerBoxTemperature(float temperature) {
-	this->chillerBoxTemperature = temperature;
+void StateController::setAmbientTemperature(float temperature) {
+	this->ambientTemperature = temperature;
 }
 
 void StateController::setSecoundsPassed(int seconds) {
@@ -37,6 +37,18 @@ void StateController::setSecoundsPassed(int seconds) {
 
 void StateController::setTargetTemperature(float targetTemperature) {
 	this->targetTemperature = targetTemperature;
+}
+
+float StateController::getTargetTemperature() {
+	return this->targetTemperature;
+}
+
+float StateController::getBeerTemperature() {
+	return this->beerTemperature;
+}
+
+float StateController::getAmbientTemperature() {
+	return this->ambientTemperature;
 }
 
 //Updates the current status, and returns the passed status.
@@ -48,11 +60,24 @@ int StateController::changeState(int state) {
 	return state;
 }
 
+//returns a string description of the current state
+String StateController::getState() {
+	if (this->currentState == this->STATE_COOLING) {
+		return "COOLING";
+	}
+	if (this->currentState == this->STATE_HEATING) {
+		return "HEATING";
+	}
+	if (this->currentState == this->STATE_OFF) {
+		return "OFF";
+	}
+	return "UNKNOWN";
+}
 
 int StateController::checkState() {
 	this->secondsPassed = this->timeTracker->getSeconds();
 
-	if (this->bucketTemperature <= -1 || this->secondsPassed <= -1 || this->targetTemperature <= -1) {
+	if (this->beerTemperature <= -1 || this->secondsPassed <= -1 || this->targetTemperature <= -1) {
 		return this->changeState(STATE_OFF);  //not initialised yet
 	}
 
@@ -66,14 +91,14 @@ int StateController::checkState() {
 			//only just switched off, staying switched off until MIN_OFF_TIME passes 
 			return this->changeState(STATE_OFF);
 		}
-		if (this->bucketTemperature >(targetTemperature + 1)) {
+		if (this->beerTemperature >(targetTemperature + 1)) {
 			String debug = "Starting cooling: ";
 			debug += this->secondsPassed;
 			Serial.println(debug);
 			//temperature is too hot, need to cool
 			return this->changeState(STATE_COOLING);
 		}
-		if (this->bucketTemperature < (targetTemperature - 1)) {
+		if (this->beerTemperature < (targetTemperature - 1)) {
 			String debug = "Starting heating: ";
 			debug += this->secondsPassed;
 			Serial.println(debug);
@@ -92,7 +117,7 @@ int StateController::checkState() {
 			Serial.println(debug);
 			return this->changeState(STATE_OFF);
 		}
-		if (this->bucketTemperature <= (targetTemperature)) {
+		if (this->beerTemperature <= (targetTemperature)) {
 			//temperature is cold enough, need to stop cooling
 			String debug = "Target temperature reached******** (was cooling)";
 			Serial.println(debug);
@@ -101,7 +126,7 @@ int StateController::checkState() {
 	}
 
 	if (this->currentState == STATE_HEATING) {
-		if (this->bucketTemperature >= (targetTemperature)) {
+		if (this->beerTemperature >= (targetTemperature)) {
 			//temperature is cold enough, need to stop cooling
 			String debug = "Target temperature reached******** (was heating)";
 			Serial.println(debug);
@@ -126,16 +151,16 @@ String StateController::getDescription() {
 	}
 	result += "  TargetTemp: ";
 	result += targetTemperature;
-//	result += ",\n";
-	result += "  BucketTemp: ";
-	result += bucketTemperature;
-//	result += ",\n";
-	result += "  ChillerBoxTemp: ";
-	result += chillerBoxTemperature;
-//	result += ",\n";
+	result += ",";
+	result += "  BeerTemp: ";
+	result += beerTemperature;
+	result += ",";
+	result += "  AmbientTemp: ";
+	result += ambientTemperature;
+	result += ",";
 	result += "  Seconds: ";
 	result += secondsPassed;
-//	result += "\n";
+	//result += "\n";
 	result += "}";
 	return result;
 }

@@ -9,8 +9,9 @@
 #include "TimeTracker.h"
 
 
-TimeTracker::TimeTracker()
+TimeTracker::TimeTracker(long timeoutMillis)
 {
+	this->timeoutMillis = timeoutMillis;
 	this->startTimeMillis = millis();
 }
 
@@ -29,4 +30,19 @@ int TimeTracker::getSeconds() {
 //Resets the start time, so effectively resets the getSeconds() count to zero
 void TimeTracker::reset() {
 	this->startTimeMillis = millis();
+}
+
+long TimeTracker::getTimeout() {
+	return this->timeoutMillis;
+}
+
+
+boolean TimeTracker::timeoutReached() {
+	unsigned long now = millis();
+	int millisPassed = (now - startTimeMillis);
+	if (millisPassed > timeoutMillis) {
+		this->reset();
+		return true;
+	}
+	return false;
 }
